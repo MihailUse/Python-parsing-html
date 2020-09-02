@@ -3,7 +3,7 @@ import csv
 from bs4 import BeautifulSoup
 from fake_useragent import UserAgent
 
-url = 'https://spb.hh.ru/catalog/Informacionnye-tehnologii-Internet-Telekom'# url для второй страницы
+url = 'https://spb.hh.ru/catalog/Informacionnye-tehnologii-Internet-Telekom'  # url для второй страницы
 r = requests.get(url, headers={'User-Agent': UserAgent().chrome}).text
 
 # def write_csv(data):\n",
@@ -18,14 +18,14 @@ r = requests.get(url, headers={'User-Agent': UserAgent().chrome}).text
 
 soup = BeautifulSoup(r, 'html')
 
-result = soup.find('div', class_=\"vacancy-serp\").find_all(\"a\", class_=\"bloko-link HH-LinkModifier\")
-all_hrefs = soup.find('div', class_=\"vacancy-serp\").find_all(\"a\", class_=\"bloko-link HH-LinkModifier\", href=True)
+result = soup.find('div', class_="vacancy-serp").find_all("a", class_="bloko-link HH-LinkModifier")
+all_hrefs = soup.find('div', class_="vacancy-serp").find_all("a", class_="bloko-link HH-LinkModifier", href=True)
 
-i = 0
-while i < 10:
-    for el in all_hrefs:
+# i = 0
+# while i < 10:
+
+for el in all_hrefs:
     print(el['href'])
 
-
-# for el in all_hrefs:\n
-#     print(el.get_text())\n
+# for el in all_hrefs:
+#     print(el.get_text())
