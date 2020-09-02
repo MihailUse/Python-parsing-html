@@ -16,7 +16,7 @@ r = requests.get(url, headers={'User-Agent': UserAgent().chrome}).text
 # def get_html_data(r):
 # url = get_html(url)
 
-soup = BeautifulSoup(r, 'html')
+soup = BeautifulSoup(r, 'html.parser')
 
 result = soup.find('div', class_="vacancy-serp").find_all("a", class_="bloko-link HH-LinkModifier")
 all_hrefs = soup.find('div', class_="vacancy-serp").find_all("a", class_="bloko-link HH-LinkModifier", href=True)
