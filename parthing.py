@@ -32,7 +32,6 @@ for i in range(int(page_len) - 1):
     if i == 5:
         break
 
-
 data = [['name_vacancy', 'vacancy_link', 'pay', 'skills']]  # columns
 
 for el in range(len(all_vacancy)):
@@ -56,13 +55,10 @@ for el in range(len(all_vacancy)):
     result = [vacancy, link, pay, skills]
     data.append(result)
 
-# print(data)
-
 # запись в csv файл
 with open('hhh.csv', 'w') as f:
     writer = csv.writer(f, delimiter=';')
     for row in data:
-        # print(row)
         writer.writerow(row)
 
 print("--- execution time %s seconds ---" % (time.time() - start_time))
