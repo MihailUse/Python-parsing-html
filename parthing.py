@@ -14,13 +14,9 @@ all_pay = soup.find("div", class_="vacancy-serp").find_all("span", {"data-qa": "
 
 # i = 0
 #  while i < 10:
-#     all_hrefs
 
 data = [['name_vacancy', 'vacancy_link', 'pay']]  # columns
 
-
-i = len(all_vacancy)
-print(i)
 for el in range(len(all_vacancy)):
     vacancy = all_vacancy[el].get_text()  # name_vacancy
     link = all_link[el]['href']  # vacancy_link
@@ -31,8 +27,7 @@ for el in range(len(all_vacancy)):
 
 # print(row)
 
-# 'a', encoding='utf-8'
-with open('hhh.csv', 'w') as f:
+with open('hhh.csv', 'w', encoding='utf-8') as f:
     writer = csv.writer(f)
     for row in data:
         print(row)
