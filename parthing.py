@@ -30,7 +30,7 @@ for page in range(page_count):
     if page == max_amount_pages:
         break
 
-    url = 'https://spb.hh.ru/catalog/Informacionnye-tehnologii-Internet-Telekom?page={page}'  # url для страницы
+    url = 'https://spb.hh.ru/catalog/Informacionnye-tehnologii-Internet-Telekom?page={}'.format(page)  # url для страницы
     r = requests.get(url, headers={'User-Agent': UserAgent().chrome}).text
     soup = BeautifulSoup(r, 'html.parser')
 
