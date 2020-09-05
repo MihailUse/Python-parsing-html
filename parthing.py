@@ -4,10 +4,11 @@ import connect  # settings
 from bs4 import BeautifulSoup
 from fake_useragent import UserAgent
 
-max_amount_pages = 1
+max_amount_pages = 3
 # max_amount_pages = int(input('Ограничение страниц: '))
 start_time = time.time()
 
+check = "SELECT id FROM it_vacancy WHERE vacancy = %s AND vacancy_link = %s AND text = %s AND skills = %s"
 sql = "INSERT INTO `it_vacancy` (`vacancy`, `vacancy_link`, `text`, `skills`) VALUES (%s, %s, %s, %s)"
 
 url = 'https://spb.hh.ru/catalog/Informacionnye-tehnologii-Internet-Telekom'  # url для страницы
@@ -58,8 +59,17 @@ for page in range(page_count):
     # подключение к бд
     connection = connect.getConnection()
     try:
+        # специальный объект который делает запросы и получает их результаты
         cursor = connection.cursor()
-        cursor.executemany(sql, result_page)
+
+        for row in result_page:
+            review = cursor.execute(check, row)
+            if review:
+                continue
+            else:
+                cursor.execute(sql, row)
+
+        # cursor.executemany(sql, result_page)
         connection.commit()
     finally:
         connection.close()
