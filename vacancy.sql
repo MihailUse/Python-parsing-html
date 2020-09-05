@@ -20,11 +20,11 @@ USE `user_log`;
 CREATE TABLE IF NOT EXISTS `it_vacancy` (
   `id` int NOT NULL AUTO_INCREMENT,
   `vacancy` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
-  `vacancy_link` tinytext NOT NULL,
+  `vacancy_link` tinytext CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
   `text` text NOT NULL,
   `skills` text CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=1995 DEFAULT CHARSET=utf8;
 
 -- Экспортируемые данные не выделены.
 

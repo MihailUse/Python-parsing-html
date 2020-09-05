@@ -4,7 +4,7 @@ import connect  # settings
 from bs4 import BeautifulSoup
 from fake_useragent import UserAgent
 
-max_amount_pages = 3
+max_amount_pages = 100
 # max_amount_pages = int(input('Ограничение страниц: '))
 start_time = time.time()
 
@@ -26,7 +26,7 @@ for page in range(page_count):
     if page == max_amount_pages:
         break
 
-    url = 'https://spb.hh.ru/catalog/Informacionnye-tehnologii-Internet-Telekom?page={page}'  # url для страницы
+    url = 'https://spb.hh.ru/catalog/Informacionnye-tehnologii-Internet-Telekom?page={}'.format(page)  # url для страницы
     r = requests.get(url, headers={'User-Agent': UserAgent().chrome}).text
     soup = BeautifulSoup(r, 'html.parser')
 
@@ -38,7 +38,7 @@ for page in range(page_count):
         vacancy = posts[post].find('a', class_='bloko-link HH-LinkModifier').text
         vacancy_link = posts[post].find('a', class_='bloko-link HH-LinkModifier', href=True)['href']
         responsibility = posts[post].find('div', {'data-qa': 'vacancy-serp__vacancy_snippet_responsibility'}).text or \
-            'Обязанности не найдены'
+                         'Обязанности не найдены'
         # print(post + 1, vacancy, vacancy_link)
 
         # получение тегов
