@@ -1,31 +1,34 @@
 import requests
 import csv
 import time
+import connect
 from bs4 import BeautifulSoup
 from fake_useragent import UserAgent
 
+max_amount_pages = 1
+# max_amount_pages = int(input('Ограничение страниц: '))
 start_time = time.time()
 
-max_amount_pages = int(input('Ограничение страниц: '))
-
-data = ['vacancy', 'vacancy_link', 'skills']  # columns
-
+sql = "INSERT INTO `it_vacancy` (`vacancy`, `vacancy_link`, `text`, `skills`) VALUES (%s, %s, %s, %s)"
+data = ['vacancy', 'vacancy_link', 'text', 'skills']  # columns
 try:
     with open('parthing.csv', 'w') as f:
         writer = csv.writer(f, delimiter=';')
         writer.writerow(data)
 except:
-    exit('Что-то пошло не так')
+    exit('Что-то пошло не так :(')
 
 url = 'https://spb.hh.ru/catalog/Informacionnye-tehnologii-Internet-Telekom'  # url для страницы
 r = requests.get(url, headers={'User-Agent': UserAgent().chrome}).text
 soup = BeautifulSoup(r, 'html.parser')
 
-page_count = int(soup.find_all('span', class_='pager-item-not-in-short-range')[2].find('a').get_text())  # оооооооооооооооооочень криво
+page_count = int(soup.find_all('span', class_='pager-item-not-in-short-range')[2].find(
+    'a').get_text())  # оооооооооооооооооочень криво
 print('Количество cтраниц: ', page_count)
 
 # перебор кождой страницы
 for page in range(page_count):
+    result_page = []
     # ограничение обрабатываемых страниц
     if page == max_amount_pages:
         break
@@ -37,11 +40,13 @@ for page in range(page_count):
     posts = soup.find('div', class_='vacancy-serp').find_all('div', {'class': 'vacancy-serp-item'})
     print('Количество постов на странице: ', len(posts))
 
-    # перебор каждого поста и добавление в файл
+    # перебор каждого поста и добавление в файл  len(posts)
     for post in range(len(posts)):
         vacancy = posts[post].find('a', class_='bloko-link HH-LinkModifier').text
         vacancy_link = posts[post].find('a', class_='bloko-link HH-LinkModifier', href=True)['href']
+        responsibility = posts[post].find('div', {'data-qa': 'vacancy-serp__vacancy_snippet_responsibility'}).text or 'Обязанности не найдены'
         # print(post + 1, vacancy, vacancy_link)
+        # print(responsibility)
 
         try:
             r = requests.get(vacancy_link, headers={'User-Agent': UserAgent().chrome}).text
@@ -55,11 +60,21 @@ for page in range(page_count):
         except:
             skills = 'Не удалось получить доступ к вакансии или же теги не указаны'
 
-        result = [vacancy, vacancy_link, skills]
+        result_page.append([vacancy, vacancy_link, responsibility, skills])
 
-        with open('parthing.csv', 'a') as f:
-            writer = csv.writer(f, delimiter=';')
-            writer.writerow(result)
+    # подключение к бд
+    connection = connect.getConnection()
+    try:
+        cursor = connection.cursor()
+        for el in range(len(result_page)):
+            # result = [(
+            #     result_page[el][0], result_page[el][0], result_page[el][0], result_page[el][0]
+            # )]
+            cursor.execute(sql, (result_page[el][0], result_page[el][1], result_page[el][2], result_page[el][3]))
+
+            connection.commit()
+    finally:
+        connection.close()
 
     print("--- page load time %s seconds ---" % (time.time() - start_time))
 
