@@ -1,7 +1,6 @@
 import requests
-import csv
 import time
-import connect
+import connect  # settings
 from bs4 import BeautifulSoup
 from fake_useragent import UserAgent
 
@@ -10,21 +9,14 @@ max_amount_pages = 1
 start_time = time.time()
 
 sql = "INSERT INTO `it_vacancy` (`vacancy`, `vacancy_link`, `text`, `skills`) VALUES (%s, %s, %s, %s)"
-data = ['vacancy', 'vacancy_link', 'text', 'skills']  # columns
-try:
-    with open('parthing.csv', 'w') as f:
-        writer = csv.writer(f, delimiter=';')
-        writer.writerow(data)
-except:
-    exit('Что-то пошло не так :(')
 
 url = 'https://spb.hh.ru/catalog/Informacionnye-tehnologii-Internet-Telekom'  # url для страницы
 r = requests.get(url, headers={'User-Agent': UserAgent().chrome}).text
 soup = BeautifulSoup(r, 'html.parser')
 
-page_count = int(soup.find_all('span', class_='pager-item-not-in-short-range')[2].find(
-    'a').get_text())  # оооооооооооооооооочень криво
-print('Количество cтраниц: ', page_count)
+# оооооооооооооооооочень криво
+page_count = int(soup.find_all('span', class_='pager-item-not-in-short-range')[2].find('a').get_text())
+print('Количество страниц: ', page_count)
 
 # перебор кождой страницы
 for page in range(page_count):
@@ -44,18 +36,19 @@ for page in range(page_count):
     for post in range(len(posts)):
         vacancy = posts[post].find('a', class_='bloko-link HH-LinkModifier').text
         vacancy_link = posts[post].find('a', class_='bloko-link HH-LinkModifier', href=True)['href']
-        responsibility = posts[post].find('div', {'data-qa': 'vacancy-serp__vacancy_snippet_responsibility'}).text or 'Обязанности не найдены'
+        responsibility = posts[post].find('div', {'data-qa': 'vacancy-serp__vacancy_snippet_responsibility'}).text or \
+            'Обязанности не найдены'
         # print(post + 1, vacancy, vacancy_link)
-        # print(responsibility)
 
+        # получение тегов
         try:
             r = requests.get(vacancy_link, headers={'User-Agent': UserAgent().chrome}).text
             soup = BeautifulSoup(r, 'html.parser')
 
             all_skills = soup.find('div', class_='bloko-tag-list').find_all('span', {'data-qa': 'bloko-tag__text'})
             skills = []
-            for el in range(len(all_skills)):
-                skills.append(all_skills[el].text)
+            for row in all_skills:
+                skills.append(row.text)
             skills = ', '.join(skills)
         except:
             skills = 'Не удалось получить доступ к вакансии или же теги не указаны'
@@ -66,13 +59,8 @@ for page in range(page_count):
     connection = connect.getConnection()
     try:
         cursor = connection.cursor()
-        for el in range(len(result_page)):
-            # result = [(
-            #     result_page[el][0], result_page[el][0], result_page[el][0], result_page[el][0]
-            # )]
-            cursor.execute(sql, (result_page[el][0], result_page[el][1], result_page[el][2], result_page[el][3]))
-
-            connection.commit()
+        cursor.executemany(sql, result_page)
+        connection.commit()
     finally:
         connection.close()
 
