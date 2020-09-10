@@ -3,10 +3,10 @@ import csv
 from bs4 import BeautifulSoup
 from fake_useragent import UserAgent
 
-max_amount_pages = 100
+max_amount_pages = 100  # максимальное кол-во обрабатываемых страниц
 columns = ['vacancy', 'link', 'responsibility', 'skills']  # название колонок в csv
 
-# определиние диалекта и определение колонок
+# определиние диалекта и определение колонок в csv
 csv.register_dialect('my_dialect', quoting=csv.QUOTE_NONNUMERIC, delimiter=";", lineterminator="\r")
 with open('parthing.csv', 'w', encoding="utf-8") as f:
     writer = csv.DictWriter(f, fieldnames=columns, dialect='my_dialect')
@@ -22,8 +22,7 @@ print('Количество cтраниц: ', page_count)
 
 # перебор кождой страницы
 for page in range(page_count):
-    print(page)
-    result = []  # массив с ваканиями с каждой страницы
+    result = []  # массив страницы с ваканиями
     # ограничение обрабатываемых страниц
     if page == max_amount_pages:
         break
@@ -56,6 +55,7 @@ for page in range(page_count):
         except:
             skills = 'Не удалось получить доступ к вакансии или же теги не указаны'
 
+        # добавление вакансий в массив страницы
         result.append([vacancy, vacancy_link, responsibility, skills])
 
     # добавление вакансий в файл
